@@ -9,4 +9,6 @@ Implemented based on the ComfyUI
 
 > python3 manage.py runserver
 
+In frontend
+
 > npm run start-react
