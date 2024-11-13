@@ -1,18 +1,18 @@
 import React, {useEffect, useState} from 'react';
 
 function App() {
-    const [username, setUsername] = useState('testuser');
+    const [username, setUsername] = useState('');
     const [access, setAccess] = useState('');
     const [refresh, setRefresh] = useState('');
-    const [password, setPassword] = useState('test123');
-    const [prompt, setPrompt] = useState('man');
+    const [password, setPassword] = useState('');
+    const [prompt, setPrompt] = useState('');
     const [promptId, setPromptId] = useState('');
     const [progress, setProgress] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [loginCompleted, setLoginCompleted] = useState(false);
     const [isInferencing, setIsInferencing] = useState(false);
 
-    const SERVER_URL = 'http://localhost:8001';
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL;
     let progressInterval = null;  // 진행 상태 확인을 위한 interval 변수
 
     const handleLogin = async () => {
