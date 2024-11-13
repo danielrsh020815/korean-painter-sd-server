@@ -11,6 +11,7 @@ function App() {
     const [imageUrl, setImageUrl] = useState('');
     const [loginCompleted, setLoginCompleted] = useState(false);
     const [isInferencing, setIsInferencing] = useState(false);
+    const [useLLM, setUseLLM] = useState(false);
 
     const SERVER_URL = process.env.REACT_APP_SERVER_URL;
     let progressInterval = null;  // 진행 상태 확인을 위한 interval 변수
@@ -39,7 +40,7 @@ function App() {
             const response = await fetch(`${SERVER_URL}/api/prompt/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 'access': access, 'prompt': prompt })
+                body: JSON.stringify({ 'access': access, 'prompt': prompt, 'use_llm': useLLM })
             });
             if (response.ok) {
                 response.json().then(data => {
@@ -131,6 +132,17 @@ function App() {
                 <button onClick={handleLogin} disabled={loginCompleted}>
                     {loginCompleted ? 'Login Completed' : 'Login'}
                 </button>
+            </div>
+
+            <div>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={useLLM}
+                        onChange={_ => setUseLLM(!useLLM)}
+                    />
+                    Use LLM for better prompt
+                </label>
             </div>
 
             <div>

@@ -62,6 +62,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    "http://ec2-52-65-224-116.ap-southeast-2.compute.amazonaws.com:8001",
 ]
 
 REST_FRAMEWORK = {
@@ -74,10 +75,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=360),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
 }
-
-CORS_ALLOWED_ORIGINS = [
-    "http://ec2-52-65-224-116.ap-southeast-2.compute.amazonaws.com:8001"
-]
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://ec2-52-65-224-116.ap-southeast-2.compute.amazonaws.com:8001/$",

@@ -1,6 +1,7 @@
 import os
 
 from dotenv import load_dotenv
+from pyexpat.errors import messages
 
 # Create your views here.
 from rest_framework.views import APIView
@@ -8,6 +9,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 import requests
+from openai import OpenAI
 
 
 class Login(APIView):
@@ -35,9 +37,13 @@ class PromptRequest(APIView):
     def post(self, request):
         access = request.data.get('access')
         prompt = request.data.get('prompt')
-        negative_prompt = 'text, watermark, nude'
+        use_llm = request.data.get('use_llm')
+        negative_prompt = 'text, watermark, nude, realistic, cinematic lighting'
         workflow = 'kimhongdo'
         image = None
+
+        if use_llm:
+            prompt = self._get_revised_prompt(prompt)
 
         # GPU 머신으로 요청 전송
         response = requests.post(
@@ -50,6 +56,24 @@ class PromptRequest(APIView):
             return Response({'success': True, 'prompt_id': response.json().get('data').get('prompt_id')}, status=status.HTTP_200_OK)
         else:
             return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
+
+    def _get_revised_prompt(self, prompt):
+        print(prompt)
+        response = _ConfigManager.openai_client().chat.completions.create(
+            model='gpt-4o',
+            messages=[
+                {
+                    'role': 'system',
+                    'content': 'You are an agent that optimizes the input provided by the user to generate an improved prompt for Stable Diffusion. You only answer with improved prompt.'
+                },
+                {
+                    'role': 'user',
+                    'content': prompt
+                },
+            ]
+        )
+
+        return response.choices[0].message.content.strip()
 
 
 class ProgressRequest(APIView):
@@ -92,16 +116,16 @@ class ImageRequest(APIView):
 class _ConfigManager:
     _loaded = False
     _gpu_machine_url = None
-    _gpu_server_id = None
-    _gpu_server_password = None
+    _openai_client = None
 
     @classmethod
     def load(cls):
         if not cls._loaded:
             load_dotenv()
             cls._gpu_machine_url = os.getenv('GPU_MACHINE_URL')
-            cls._gpu_server_id = os.getenv('GPU_SERVER_ID')
-            cls._gpu_server_password = os.getenv('GPU_SERVER_PASSWORD')
+            cls._openai_client = OpenAI(
+                api_key=os.getenv('OPENAI_API_KEY'),
+            )
 
     @classmethod
     def gpu_machine_url(cls):
@@ -109,11 +133,6 @@ class _ConfigManager:
         return cls._gpu_machine_url
 
     @classmethod
-    def gpu_server_id(cls):
+    def openai_client(cls) -> OpenAI:
         cls.load()
-        return cls._gpu_server_id
-
-    @classmethod
-    def gpu_server_password(cls):
-        cls.load()
-        return cls._gpu_server_password
+        return cls._openai_client
