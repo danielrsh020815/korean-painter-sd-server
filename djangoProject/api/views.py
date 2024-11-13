@@ -1,11 +1,10 @@
 import os
 
-from django.shortcuts import render
 from dotenv import load_dotenv
 
 # Create your views here.
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 import requests
@@ -15,8 +14,6 @@ class Login(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        print(_ConfigManager.gpu_machine_url())
-
         username = request.data.get('username')
         password = request.data.get('password')
 
